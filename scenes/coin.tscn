@@ -1,7 +1,8 @@
-[gd_scene load_steps=17 format=3 uid="uid://yfsd1w4reptb"]
+[gd_scene load_steps=20 format=3 uid="uid://yfsd1w4reptb"]
 
 [ext_resource type="Script" uid="uid://b4rxp18tupgag" path="res://scripts/coin.gd" id="1_i64fm"]
 [ext_resource type="Texture2D" uid="uid://cn1tnn7uhqd02" path="res://assets/sprites/coin.png" id="1_rwqht"]
+[ext_resource type="AudioStream" uid="uid://8e7ol0h34g8h" path="res://assets/sounds/coin.wav" id="3_11l1o"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_i64fm"]
 atlas = ExtResource("1_rwqht")
@@ -98,6 +99,14 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_ssuvv"]
 radius = 5.0
 
+[sub_resource type="Animation" id="Animation_d14el"]
+resource_name = "pickup"
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_1ikuy"]
+_data = {
+&"pickup": SubResource("Animation_d14el")
+}
+
 [node name="coin" type="Area2D"]
 collision_mask = 2
 script = ExtResource("1_i64fm")
@@ -108,5 +117,14 @@ autoplay = "default"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_ssuvv")
+
+[node name="PickupSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("3_11l1o")
+bus = &"SFX"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_1ikuy")
+}
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
