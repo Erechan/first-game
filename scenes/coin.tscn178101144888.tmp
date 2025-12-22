@@ -106,8 +106,6 @@ script = ExtResource("1_i64fm")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_ls27i")
 autoplay = "default"
-frame = 2
-frame_progress = 0.23399507
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_ssuvv")
@@ -117,6 +115,6 @@ stream = ExtResource("3_11l1o")
 bus = &"SFX"
 
 [node name="Timer" type="Timer" parent="."]
-wait_time = 0.2
+wait_time = 0.5
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
