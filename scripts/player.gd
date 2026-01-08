@@ -1,42 +1,38 @@
 extends CharacterBody2D
 
-
-const SPEED = 130.0
-const JUMP_VELOCITY = -300.0
+@export var SPEED: float = 130.0
+@export var JUMP_VELOCITY: float = -300.0
+@export var joystick: VirtualJoystick  # 摇杆节点引用
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 
-
 func _physics_process(delta: float) -> void:
-	# Add the gravity.
+	# 1. 重力处理
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 
-	# Handle jump.
+	# 2. 合并摇杆+键盘的移动方向
+	var move_dir: Vector2 = Vector2.ZERO
+	# 摇杆方向
+	if joystick:
+		move_dir = joystick.output
+	# 键盘方向（补充兼容）
+	move_dir.x = move_dir.x if move_dir.x != 0 else Input.get_axis("move_left", "move_right")
+
+	# 3. 移动赋值
+	velocity.x = move_dir.x * SPEED
+	move_and_slide()
+
+	# 4. 跳跃处理
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
-
-	# Get the input direction, includes -1,0,1
-	var direction := Input.get_axis("move_left", "move_right")
 	
-	# Flip the sprite
-	if direction > 0:
+	# 5. 精灵翻转（基于移动方向）
+	if move_dir.x > 0:
 		animated_sprite_2d.flip_h = false
-	elif direction < 0:
+	elif move_dir.x < 0:
 		animated_sprite_2d.flip_h = true
-	 
-	#play animations
+		
+#补充移动端用跳跃键来跳！！！
+func _on_android_control_jump_pressed() -> void:
 	if is_on_floor():
-		if direction == 0:
-			animated_sprite_2d.play("idel")
-		else:
-			animated_sprite_2d.play("run")  
-	else:
-		animated_sprite_2d.play("jump")
-	
-	#Apply movement
-	if direction:
-		velocity.x = direction * SPEED
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-
-	move_and_slide()
+		velocity.y = JUMP_VELOCITY

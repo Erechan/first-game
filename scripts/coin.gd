@@ -6,7 +6,6 @@ extends Area2D
 @onready var coin: Area2D = $"."
 @onready var timer: Timer = $Timer
 
-
 func _on_body_entered(body: Node2D) -> void:
 	game_manager.add_point()
 	pickup_sound.play()

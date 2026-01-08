@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=4 uid="uid://b5pbspwp3f6sl"]
+[gd_scene load_steps=35 format=4 uid="uid://b5pbspwp3f6sl"]
 
 [ext_resource type="Script" uid="uid://cadcdxgg22rbn" path="res://scripts/game_manager.gd" id="1_gee14"]
 [ext_resource type="PackedScene" uid="uid://8p1yvuc4go0h" path="res://scenes/player.tscn" id="1_uwrxv"]
@@ -9,6 +9,12 @@
 [ext_resource type="PackedScene" uid="uid://cvwd5idvcbc86" path="res://scenes/killzone.tscn" id="5_iywne"]
 [ext_resource type="PackedScene" uid="uid://btx2en56i73y" path="res://scenes/slime.tscn" id="6_p57ef"]
 [ext_resource type="FontFile" uid="uid://c5w566k8l4mpb" path="res://assets/fonts/PixelOperator8.ttf" id="7_u5sy4"]
+[ext_resource type="Texture2D" uid="uid://b7q0scm0ubelo" path="res://assets/sprites/pause_normal.png" id="10_dinhu"]
+[ext_resource type="Theme" uid="uid://ckhmojajsxwkk" path="res://pause_theme.tres" id="10_kvuet"]
+[ext_resource type="Script" uid="uid://k1itqvg76wnl" path="res://scripts/pause_menu.gd" id="10_trtic"]
+[ext_resource type="Texture2D" uid="uid://beh0poxjispxa" path="res://assets/sprites/pause_hover.png" id="10_vtaks"]
+[ext_resource type="Texture2D" uid="uid://bk7qqwqjp0pvq" path="res://assets/sprites/pause_pressed.png" id="11_kvuet"]
+[ext_resource type="PackedScene" uid="uid://dmr0fcamx7t56" path="res://scenes/virtual_joystick/virtual_joystick_scene.tscn" id="15_ir15t"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lnu2h"]
 texture = ExtResource("2_yqjtg")
@@ -418,6 +424,16 @@ _data = {
 &"move2": SubResource("Animation_u5sy4")
 }
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ir15t"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ca42v"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rysoc"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ssvqc"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_264po"]
+
 [node name="Game" type="Node2D"]
 
 [node name="GameManager" type="Node" parent="."]
@@ -449,15 +465,26 @@ tile_map_data = PackedByteArray("AADt/wUAAAAAAA4AAADu/wUAAAAAAA4AAADv/wUAAAAAAA4
 tile_set = SubResource("TileSet_p57ef")
 collision_enabled = false
 
-[node name="Player" parent="." instance=ExtResource("1_uwrxv")]
+[node name="Player" parent="." node_paths=PackedStringArray("joystick") instance=ExtResource("1_uwrxv")]
 position = Vector2(14, 26)
+joystick = NodePath("../UI/Virtual_Joystick")
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
+light_mask = 17
+visibility_layer = 17
 position = Vector2(0, -4)
 zoom = Vector2(4, 4)
 process_callback = 0
-limit_bottom = 120
+limit_left = -10000021
+limit_top = -9999993
+limit_right = 9999979
+limit_bottom = 127
 position_smoothing_enabled = true
+
+[node name="Enemy" type="Node2D" parent="."]
+
+[node name="slime" parent="Enemy" instance=ExtResource("6_p57ef")]
+position = Vector2(152, 11)
 
 [node name="killzone" parent="." instance=ExtResource("5_iywne")]
 position = Vector2(-28, 16)
@@ -515,9 +542,6 @@ libraries = {
 }
 autoplay = "move2"
 
-[node name="slime" parent="." instance=ExtResource("6_p57ef")]
-position = Vector2(152, 11)
-
 [node name="Labels" type="Node" parent="."]
 
 [node name="Label" type="Label" parent="Labels"]
@@ -560,12 +584,130 @@ theme_override_fonts/font = ExtResource("7_u5sy4")
 theme_override_font_sizes/font_size = 8
 text = "Jump Left"
 
-[node name="Label5" type="Label" parent="Labels"]
-offset_left = 848.0
-offset_top = -243.0
-offset_right = 951.0
-offset_bottom = -188.0
-theme_override_colors/font_color = Color(0.09803922, 0.3137255, 0.7529412, 1)
-theme_override_fonts/font = ExtResource("7_u5sy4")
-theme_override_font_sizes/font_size = 8
-text = "Good job !"
+[node name="PauseUI" type="CanvasLayer" parent="." node_paths=PackedStringArray("pause_panel", "pause_btn", "resume_btn", "quit_btn")]
+process_mode = 3
+script = ExtResource("10_trtic")
+pause_panel = NodePath("Control/PausePanel")
+pause_btn = NodePath("Control/TextureButton")
+resume_btn = NodePath("Control/PausePanel/ResumeButton")
+quit_btn = NodePath("Control/PausePanel/QuitButton")
+
+[node name="Control" type="Control" parent="PauseUI"]
+z_index = 1
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+theme = ExtResource("10_kvuet")
+
+[node name="TextureButton" type="TextureButton" parent="PauseUI/Control"]
+process_mode = 3
+z_index = 1
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -47.0
+offset_bottom = 47.0
+grow_horizontal = 0
+texture_normal = ExtResource("10_dinhu")
+texture_pressed = ExtResource("11_kvuet")
+texture_hover = ExtResource("10_vtaks")
+stretch_mode = 4
+
+[node name="PausePanel" type="Panel" parent="PauseUI/Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="PauseUI/Control/PausePanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -63.0
+offset_top = -139.0
+offset_right = 63.0
+offset_bottom = -115.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 36
+text = "PAUSED"
+
+[node name="ResumeButton" type="Button" parent="PauseUI/Control/PausePanel"]
+process_mode = 3
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -211.0
+offset_top = -31.0
+offset_right = 211.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 24
+text = "RESUME"
+
+[node name="QuitButton" type="Button" parent="PauseUI/Control/PausePanel"]
+process_mode = 3
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -211.0
+offset_top = -214.0
+offset_right = 211.0
+offset_bottom = -103.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "QUIT"
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Virtual_Joystick" parent="UI" instance=ExtResource("15_ir15t")]
+offset_top = -382.0
+offset_right = 405.0
+offset_bottom = 0.0
+mouse_filter = 1
+joystick_mode = 2
+
+[node name="AndroidControl_JUMP" type="Button" parent="UI"]
+process_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -574.0
+offset_top = -514.0
+grow_horizontal = 0
+grow_vertical = 0
+size_flags_horizontal = 4
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 0, 1)
+theme_override_colors/font_outline_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxEmpty_ir15t")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_ca42v")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_rysoc")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_ssvqc")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_264po")
+text = "
+
+
+JUMP"
+
+[connection signal="pressed" from="UI/AndroidControl_JUMP" to="Player" method="_on_android_control_jump_pressed"]
